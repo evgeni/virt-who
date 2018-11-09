@@ -188,22 +188,8 @@ def _main(executor):
                 return 1
             hypervisors = []
             for config, report in result.items():
-                if isinstance(report, DomainListReport):
-                    hypervisors.append({
-                        'guests': [guest.toDict() for guest in report.guests]
-                    })
-                elif isinstance(report, HostGuestAssociationReport):
-                    for hypervisor in report.association['hypervisors']:
-                        h = OrderedDict((
-                            ('uuid', hypervisor.hypervisorId),
-                            ('guests',
-                             [guest.toDict() for guest in hypervisor.guestIds])
-                        ))
-                        if hypervisor.facts:
-                            h['facts'] = hypervisor.facts
-                        if hypervisor.name:
-                            h['name'] = hypervisor.name
-                        hypervisors.append(h)
+                hypervisors.extend(report.hypervisors)
+
             data = json.dumps({
                 'hypervisors': hypervisors
             })

@@ -184,6 +184,10 @@ class AbstractVirtReport(object):
     def hash(self):
         return hash(self)
 
+    @property
+    def hypervisors(self):
+        return []
+
 
 class ErrorReport(AbstractVirtReport):
     """
@@ -219,6 +223,10 @@ class DomainListReport(AbstractVirtReport):
                 sort_keys=True)
         current_hash += str(self.hypervisor_id)
         return hashlib.sha256(current_hash.encode('utf-8')).hexdigest()
+
+    @property
+    def hypervisors(self):
+        return [{'guests': [guest.toDict() for guest in self.guests]}]
 
 
 class HostGuestAssociationReport(AbstractVirtReport):
@@ -314,6 +322,22 @@ class HostGuestAssociationReport(AbstractVirtReport):
     @property
     def hash(self):
         return hashlib.sha256(json.dumps(self.serializedAssociation, sort_keys=True).encode('utf-8')).hexdigest()
+
+    @property
+    def hypervisors(self):
+        hypervisors = []
+        for hypervisor in self.association['hypervisors']:
+            h = OrderedDict((
+                ('uuid', hypervisor.hypervisorId),
+                ('guests',
+                 [guest.toDict() for guest in hypervisor.guestIds])
+            ))
+            if hypervisor.facts:
+                h['facts'] = hypervisor.facts
+            if hypervisor.name:
+                h['name'] = hypervisor.name
+            hypervisors.append(h)
+        return hypervisors
 
 
 class IntervalThread(Thread):
