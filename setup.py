@@ -101,7 +101,8 @@ setup(
     entry_points={
         'console_scripts': [
             'virt-who = virtwho.__main__:main',
-            'virt-who-password = virtwho.password.__main__:main'
+            'virt-who-password = virtwho.password.__main__:main',
+            'virt-who-generate = virtwho.generate.__main__:main'
         ]
     },
     include_package_data=True,
